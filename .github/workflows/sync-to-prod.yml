@@ -20,18 +20,22 @@ jobs:
       # Step 2: Create branch in main-repo and copy files safely
       - name: Create branch in main-repo
         run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-
           # Clone PROD repo
           git clone https://github.com/databricks-learning-for-capy/main-repo.git main-repo
           cd main-repo
+
+          # Set Git identity locally for this repo
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+          # Create new branch
           git checkout -b dev-sync
 
-          # Copy files from DEV repo, excluding main-repo folder itself
+          # Copy files from DEV repo safely, excluding the main-repo folder
           shopt -s extglob
           cp -r ../!(main-repo) .
 
+          # Add, commit, push changes
           git add .
           git commit -m "Sync from databricks-test"
           git push https://${{ secrets.REPO_SYNC_TOKEN }}@github.com/databricks-learning-for-capy/main-repo.git dev-sync
