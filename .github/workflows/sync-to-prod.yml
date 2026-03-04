@@ -1,46 +1,43 @@
 name: Sync DEV to PROD via PR
 
 on:
-  workflow_dispatch:         # Allows manual run
+  workflow_dispatch:
   push:
     branches:
-      - main                # Trigger automatically when DEV main is updated
+      - main
 
 jobs:
   create_pr:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout DEV repo (databricks-test)
       - name: Checkout DEV repo
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      # Step 2: Create branch in main-repo and copy files safely
       - name: Create branch in main-repo
         run: |
           # Clone PROD repo
           git clone https://github.com/databricks-learning-for-capy/main-repo.git main-repo
           cd main-repo
 
-          # Set Git identity locally for this repo
+          # Set Git identity locally
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
 
           # Create new branch
           git checkout -b dev-sync
 
-          # Copy files from DEV repo safely, excluding the main-repo folder
+          # Copy files safely from DEV repo
           shopt -s extglob
           cp -r ../!(main-repo) .
 
-          # Add, commit, push changes
+          # Add, commit, push using your classic PAT secret
           git add .
           git commit -m "Sync from databricks-test"
           git push https://${{ secrets.REPO_SYNC_TOKEN }}@github.com/databricks-learning-for-capy/main-repo.git dev-sync
 
-      # Step 3: Create Pull Request in main-repo
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
