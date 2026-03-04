@@ -3,21 +3,31 @@ name: Sync databricks-test to databricks-prod
 on:
   push:
     branches:
-      - databricks-test
-  workflow_dispatch:   # 👈 THIS enables the Run button
+      - main
+
+  workflow_dispatch:   # 👈 allows manual run
+
+permissions:
+  contents: write
 
 jobs:
   sync:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout source repo (databricks-test)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Sync test branch to prod branch
+      - name: Push to databricks-prod repo
+        env:
+          TARGET_REPO: databricks-learning-for-capy/databricks-prod
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git checkout databricks-prod || git checkout -b databricks-prod
-          git reset --hard origin/databricks-test
-          git push origin databricks-prod --force
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git remote add prod https://x-access-token:${GH_TOKEN}@github.com/${TARGET_REPO}.git
+
+          git push prod main --force
