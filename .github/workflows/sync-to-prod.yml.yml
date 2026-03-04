@@ -1,6 +1,6 @@
-name: Sync main to databricks-test
+name: Push DEV to PROD
 
-# Trigger: automatic on push to main, or manual run
+# Trigger: run manually or on push to main branch in databricks-test
 on:
   push:
     branches:
@@ -8,26 +8,26 @@ on:
   workflow_dispatch:
 
 jobs:
-  sync:
+  push_to_prod:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout main-repo
-      - name: Checkout main-repo
+      # Step 1: Checkout DEV repo (databricks-test)
+      - name: Checkout databricks-test
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # full history required for push
+          fetch-depth: 0
 
-      # Step 2: Setup Git identity for commit
+      # Step 2: Setup Git
       - name: Setup Git
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
 
-      # Step 3: Push to databricks-test
-      - name: Push to databricks-test
+      # Step 3: Push to main-repo
+      - name: Push to main-repo
         env:
           TOKEN: ${{ secrets.REPO_SYNC_TOKEN }}
         run: |
-          git remote add mirror https://${TOKEN}@github.com/databricks-learning-for-capy/databricks-test.git
-          git push mirror main --force
+          git remote add prod https://${TOKEN}@github.com/databricks-learning-for-capy/main-repo.git
+          git push prod main --force
