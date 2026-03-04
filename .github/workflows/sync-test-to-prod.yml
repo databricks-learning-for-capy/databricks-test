@@ -10,13 +10,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source branch
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: databricks-test
           fetch-depth: 0
 
-      - name: Push to prod repo
+      - name: Sync test branch to prod branch
         run: |
-          git remote add target https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/databricks-learning-for-capy/REPO_B_NAME.git
-          git push target databricks-test:databricks-prod --force
+          git checkout databricks-prod || git checkout -b databricks-prod
+          git reset --hard origin/databricks-test
+          git push origin databricks-prod --force
