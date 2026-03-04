@@ -26,6 +26,6 @@ jobs:
         with:
           repository: databricks-learning-for-capy/main-repo
           branch: main
-          github_token: ${{ secrets.REPO_SYNC_TOKEN }}   # classic PAT secret
+          github_token: ${{ secrets.reposync}}   # classic PAT secret
           force: true
           directory: .
