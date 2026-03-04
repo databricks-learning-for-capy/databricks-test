@@ -11,21 +11,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout DEV repo (databricks-test)
       - name: Checkout databricks-test
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Authenticate GitHub CLI
-        uses: cli/gh-action@v2
+      # Step 2: Commit & Push to main-repo
+      - name: Push to main-repo
+        uses: ad-m/github-push-action@v0.6.0
         with:
-          token: ${{ secrets.REPO_SYNC_TOKEN }}
-
-      - name: Push changes to main-repo
-        run: |
-          gh repo clone databricks-learning-for-capy/main-repo repo-prod
-          cp -r ./* repo-prod/
-          cd repo-prod
-          git add .
-          git commit -m "Sync from databricks-test"
-          git push origin main
+          repository: databricks-learning-for-capy/main-repo
+          branch: main
+          github_token: ${{ secrets.REPO_SYNC_TOKEN }}
+          force: true
