@@ -1,0 +1,22 @@
+name: Sync databricks-test to databricks-prod
+
+on:
+  push:
+    branches:
+      - databricks-test
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source branch
+        uses: actions/checkout@v4
+        with:
+          ref: databricks-test
+          fetch-depth: 0
+
+      - name: Push to prod repo
+        run: |
+          git remote add target https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/databricks-learning-for-capy/REPO_B_NAME.git
+          git push target databricks-test:databricks-prod --force
