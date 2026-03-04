@@ -11,16 +11,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout DEV repo
       - name: Checkout DEV repo
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      # Create branch in main-repo and copy files safely
       - name: Create branch in main-repo
         run: |
-          # Clone PROD repo
           git clone https://github.com/databricks-learning-for-capy/main-repo.git main-repo
           cd main-repo
 
@@ -31,16 +28,16 @@ jobs:
           # Create new branch
           git checkout -b dev-sync
 
-          # Copy DEV files safely, excluding cloned main-repo folder
+          # Copy DEV files safely
           shopt -s extglob
           cp -r ../!(main-repo) .
 
-          # Add, commit, and push using the PAT
           git add .
           git commit -m "Sync from databricks-test"
+
+          # ✅ Push using PAT (this fixes the 403 / "read password" error)
           git push https://${{ secrets.REPO_SYNC_TOKEN }}@github.com/databricks-learning-for-capy/main-repo.git dev-sync
 
-      # Create Pull Request in main-repo
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
