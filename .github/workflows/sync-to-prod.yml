@@ -11,11 +11,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout DEV repo
       - name: Checkout DEV repo
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
+      # Create branch in main-repo and copy files safely
       - name: Create branch in main-repo
         run: |
           # Clone PROD repo
@@ -29,15 +31,16 @@ jobs:
           # Create new branch
           git checkout -b dev-sync
 
-          # Copy files safely from DEV repo
+          # Copy DEV files safely, excluding cloned main-repo folder
           shopt -s extglob
           cp -r ../!(main-repo) .
 
-          # Add, commit, push using your classic PAT secret
+          # Add, commit, and push using the PAT
           git add .
           git commit -m "Sync from databricks-test"
           git push https://${{ secrets.REPO_SYNC_TOKEN }}@github.com/databricks-learning-for-capy/main-repo.git dev-sync
 
+      # Create Pull Request in main-repo
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
