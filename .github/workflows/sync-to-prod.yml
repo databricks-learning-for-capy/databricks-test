@@ -1,17 +1,15 @@
 name: Sync DEV to PROD
 
 on:
-  # Trigger automatically when a PR is merged
+  workflow_dispatch:        # Allows manual run
   pull_request:
-    types: [closed]
+    types: [closed]        # Trigger when a PR is merged
     branches:
       - main
 
-  # Also allow manual run for testing
-  workflow_dispatch:
-
 jobs:
   sync_to_prod:
+    # Run if PR merged or manually triggered
     if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
@@ -22,11 +20,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Step 2: Push to main-repo using PAT secret
+      # Step 2: Push to main-repo using classic PAT
       - name: Push to main-repo
         uses: ad-m/github-push-action@v0.6.0
         with:
           repository: databricks-learning-for-capy/main-repo
           branch: main
-          github_token: ${{ secrets.REPO_SYNC_TOKEN }}
+          github_token: ${{ secrets.REPO_SYNC_TOKEN }}   # classic PAT secret
           force: true
+          directory: .
