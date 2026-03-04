@@ -29,5 +29,5 @@ jobs:
         env:
           TOKEN: ${{ secrets.REPO_SYNC_TOKEN }}
         run: |
-          git remote add prod https://${TOKEN}@github.com/databricks-learning-for-capy/main-repo.git
+          git remote add prod https://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@github.com/databricks-learning-for-capy/main-repo.git
           git push prod main --force
