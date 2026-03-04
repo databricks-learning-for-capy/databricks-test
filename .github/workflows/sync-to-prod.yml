@@ -1,16 +1,13 @@
-name: Sync DEV to PROD
+name: Sync DEV to PROD via PR
 
 on:
-  workflow_dispatch:        # Allows manual run
-  pull_request:
-    types: [closed]        # Trigger when a PR is merged
+  workflow_dispatch:         # Allows manual run for testing
+  push:
     branches:
-      - main
+      - main                # Trigger automatically when DEV main is updated
 
 jobs:
-  sync_to_prod:
-    # Run if PR merged or manually triggered
-    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
+  create_pr:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,12 +17,26 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Step 2: Push to main-repo using classic PAT
-      - name: Push to main-repo
-        uses: ad-m/github-push-action@v0.6.0
+      # Step 2: Create a branch in main-repo and push changes
+      - name: Create branch in main-repo
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git clone https://github.com/databricks-learning-for-capy/main-repo.git main-repo
+          cd main-repo
+          git checkout -b dev-sync
+          cp -r ../* .      # copy all files from databricks-test
+          git add .
+          git commit -m "Sync from databricks-test"
+          git push https://${{ secrets.REPO_SYNC_TOKEN }}@github.com/databricks-learning-for-capy/main-repo.git dev-sync
+
+      # Step 3: Create Pull Request in main-repo
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
         with:
-          repository: databricks-learning-for-capy/main-repo
-          branch: main
-          github_token: ${{ secrets.REPOSYNC }}   # classic PAT secret
-          force: true
-          directory: .
+          token: ${{ secrets.REPO_SYNC_TOKEN }}
+          commit-message: "Sync from databricks-test"
+          branch: dev-sync
+          base: main
+          title: "Sync DEV to PROD"
+          body: "Automatic sync from databricks-test repo"
