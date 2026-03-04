@@ -21,21 +21,18 @@ jobs:
           git clone https://github.com/databricks-learning-for-capy/main-repo.git main-repo
           cd main-repo
 
-          # Set Git identity locally
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
 
-          # Create new branch
           git checkout -b dev-sync
 
-          # Copy DEV files safely
           shopt -s extglob
           cp -r ../!(main-repo) .
 
           git add .
           git commit -m "Sync from databricks-test"
 
-          # ✅ Push using PAT (this fixes the 403 / "read password" error)
+          # Push using PAT secret
           git push https://${{ secrets.REPO_SYNC_TOKEN }}@github.com/databricks-learning-for-capy/main-repo.git dev-sync
 
       - name: Create Pull Request
