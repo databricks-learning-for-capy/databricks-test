@@ -1,23 +1,24 @@
-name: Push DEV to PROD
+name: Sync DEV to PROD
 
 on:
-  push:
+  pull_request:
+    types: [closed]       # triggers when PR is merged or closed
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
-  push_to_prod:
+  sync_to_prod:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout DEV repo (databricks-test)
+      # Checkout DEV repo (databricks-test)
       - name: Checkout databricks-test
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      # Step 2: Commit & Push to main-repo
+      # Push to main-repo using PAT secret
       - name: Push to main-repo
         uses: ad-m/github-push-action@v0.6.0
         with:
