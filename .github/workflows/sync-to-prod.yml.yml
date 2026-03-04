@@ -26,8 +26,8 @@ jobs:
       # Step 3: Push changes to main-repo
       - name: Push to main-repo
         env:
-          REPO_B: https://github.com/databricks-learning-for-capy/databricks-prod.git
+          REPO_B: https://github.com/databricks-learning-for-capy/main-repo.git
           TOKEN: ${{ secrets.REPO_SYNC_TOKEN }}
         run: |
-          git remote add mirror https://${TOKEN}@github.com/databricks-learning-for-capy/databricks-prod.git
+          git remote add mirror https://${TOKEN}@github.com/databricks-learning-for-capy/main-repo.git
           git push mirror main --force
