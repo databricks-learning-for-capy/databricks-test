@@ -1,6 +1,6 @@
-name: Sync main to main-repo
+name: Sync main to databricks-test
 
-# Trigger: run when main is updated
+# Trigger: automatic on push to main, or manual run
 on:
   push:
     branches:
@@ -10,24 +10,24 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
+
     steps:
-      # Step 1: Checkout Repo-A
-      - name: Checkout Repo-A
+      # Step 1: Checkout main-repo
+      - name: Checkout main-repo
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # fetch full history
+          fetch-depth: 0  # full history required for push
 
-      # Step 2: Configure Git with a bot name/email
+      # Step 2: Setup Git identity for commit
       - name: Setup Git
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
 
-      # Step 3: Push changes to main-repo
-      - name: Push to main-repo
+      # Step 3: Push to databricks-test
+      - name: Push to databricks-test
         env:
-          REPO_B: https://github.com/databricks-learning-for-capy/main-repo.git
           TOKEN: ${{ secrets.REPO_SYNC_TOKEN }}
         run: |
-          git remote add mirror https://${TOKEN}@github.com/databricks-learning-for-capy/main-repo.git
+          git remote add mirror https://${TOKEN}@github.com/databricks-learning-for-capy/databricks-test.git
           git push mirror main --force
