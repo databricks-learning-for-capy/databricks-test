@@ -1,6 +1,5 @@
 name: Push DEV to PROD
 
-# Trigger: run manually or on push to main branch in databricks-test
 on:
   push:
     branches:
@@ -12,22 +11,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout DEV repo (databricks-test)
       - name: Checkout databricks-test
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      # Step 2: Setup Git
-      - name: Setup Git
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
+      - name: Authenticate GitHub CLI
+        uses: cli/gh-action@v2
+        with:
+          token: ${{ secrets.REPO_SYNC_TOKEN }}
 
-      # Step 3: Push to main-repo
-      - name: Push to main-repo
-        env:
-          TOKEN: ${{ secrets.REPO_SYNC_TOKEN }}
+      - name: Push changes to main-repo
         run: |
-          git remote add prod https://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@github.com/databricks-learning-for-capy/main-repo.git
-          git push prod main --force
+          gh repo clone databricks-learning-for-capy/main-repo repo-prod
+          cp -r ./* repo-prod/
+          cd repo-prod
+          git add .
+          git commit -m "Sync from databricks-test"
+          git push origin main
