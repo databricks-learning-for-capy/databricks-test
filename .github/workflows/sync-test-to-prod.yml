@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - databricks-test
+  workflow_dispatch:   # 👈 THIS enables the Run button
 
 jobs:
   sync:
